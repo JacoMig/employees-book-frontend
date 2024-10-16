@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/Auth";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 import { Navigate, useLocation } from "react-router-dom";
@@ -14,8 +15,6 @@ const AuthGuardedRoute = ({
   const {isLoading, user} = useAuth()
   
   if (isLoading) return;
-
-  
 
   if (!user && !location.pathname.includes('login')) 
     return <Navigate to={"/login"} />;

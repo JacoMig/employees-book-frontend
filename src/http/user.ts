@@ -12,7 +12,7 @@ interface IHttpUserClient {
     usernameOrEmail: string,
     password: string
   ) => Promise<{ token: string }>;
-  get: (id: string) => Promise<IUser | undefined>;
+  get: (id: string) => Promise<IUser>;
   list: () => Promise<IUser[]>;
   remove: (id: string) => Promise<object>;
   patch: (id: string, params:PatchUser) => Promise<object>;

@@ -1,5 +1,6 @@
 import { IUser } from "@/models/dtos";
 import React, {
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -10,12 +11,12 @@ import { jwtDecode } from "jwt-decode";
 
 import httpUserClient from "@/http/user";
 import { Spinner } from "@/components/ui/spinner";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export interface IAuthContext {
-  logout: () => void
-  login: (email: string, password: string) => void
-  getUser: () => void
+  logout: () => void;
+  login: (email: string, password: string) => void;
+  getUser: () => void;
   user: IUser | undefined;
   isLoading: boolean;
 }
@@ -52,60 +53,43 @@ export function setStoredToken(token: string) {
 }
 
 export function removeStoredToken() {
-  localStorage.removeItem(key)
+  localStorage.removeItem(key);
 }
 
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { get, login:userLogin } = httpUserClient();
-  const [user, setUser] = useState<IUser>()
-  const [isLoading, setIsLoading] = useState(true)
-  /* const [isError, setIsError] = useState(false) */
- 
- 
+  const { get, login: userLogin } = httpUserClient();
 
-  const getUser = async () => {
-    setIsLoading(true)
-    console.log('getUser')  
-    const { decoded } = getDecodedToken();
-    if(!decoded?.payload.id) {
-      setIsLoading(false)
-      return
-    }
-   
-    try {
-      const u = await get(decoded?.payload.id)
-      if(u) 
-        setUser(u)
-    }catch(e) {
-      console.log(e)  
-    }
-    finally{
-      setIsLoading(false)
-    }
-  }
+  const queryClient = useQueryClient()
+  const { data: user, isLoading, refetch:getUser } = useQuery({
+    queryKey: ["getUser"],
+    retry: false,
+    queryFn: async ():Promise<IUser> => {
+      const { decoded } = getDecodedToken();
+      return await get(decoded?.payload.id!)
+    },
+  });
+  
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await userLogin(email!, password!)
-    setStoredToken(response.token)
-    
-  }, [])
-  
+    const response = await userLogin(email!, password!);
+    setStoredToken(response.token);
+  }, []);
+
   const logout = useCallback(() => {
-    setUser(undefined)
-    removeStoredToken()
-  }, [])
+    queryClient.setQueryData(['getUser'], () => null)
+    removeStoredToken();
+  }, []);
 
+  
 
-  useEffect(() => {
-    getUser()
-    console.log('auth useEffect')
-  }, [])
+  console.log("auth");
 
-  console.log('auth')
-
-  if(isLoading) 
-    return <div><Spinner /></div>
+  if (isLoading)
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
 
   return (
     <AuthContext.Provider
@@ -124,9 +108,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = React.useContext(AuthContext);
- 
+
   if (!context) {
     throw new Error("context must be used with an AuthProvider");
-  } 
+  }
   return context;
 };

@@ -1,9 +1,10 @@
-import { AuthProvider, useAuth } from "@/context/Auth";
+import { useAuth } from "@/context/Auth";
 import { Link, Outlet } from "react-router-dom";
 import AuthGuardedRoute from "./authGuardedRoute";
 
 const Navigation = () => {
   const { user } = useAuth();
+  
   return (
     <>
       <div className="p-2 flex gap-2">

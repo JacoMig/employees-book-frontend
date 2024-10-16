@@ -12,16 +12,17 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useAuth } from "@/context/Auth";
 import httpUserClient from "@/http/user";
 import { useCallback, useMemo } from "react";
 import httpUploadsClient from "@/http/uploads";
 import { TrashIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DatePicker } from "./DatePicker";
-import { format } from "date-fns"
+import { IUser, PatchUser } from "@/models/dtos";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getDirtyFieldsValues } from "@/lib/utils";
 
-const formSchema = z.object({
+export const formSchema = z.object({
   username: z
     .string()
     .min(1, {
@@ -36,7 +37,7 @@ const formSchema = z.object({
   jobTitle: z.string().optional(),
   department: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  cv: z
+  cvUrl: z
     .union([
       z.instanceof(File).refine((file) => file.size < 7000000, {
         message: "Your resume must be less than 7MB.",
@@ -47,60 +48,97 @@ const formSchema = z.object({
   hiringDate: z.optional(z.string()),
 });
 
-const ProfileForm = () => {
+type MutationParams = {
+  id: string;
+  params?: PatchUser;
+  formData?: FormData;
+  remove?: {
+    filename: string
+  }
+};
+
+const ProfileForm = ({ user }: { user: IUser }) => {
   const { patch } = httpUserClient();
   const { update, remove } = httpUploadsClient();
-  const { user, getUser } = useAuth();
-
-  const currentUser = user!;
-
+  const queryClient = useQueryClient()
+ 
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: currentUser.username,
-      email: currentUser.email,
-      jobTitle: currentUser.jobTitle || "",
-      firstName: currentUser.firstName || "",
-      lastName: currentUser.lastName || "",
-      cv: currentUser.cvUrl || "",
-      hiringDate: currentUser.hiringDate || "",
+      username: user.username,
+      email: user.email,
+      jobTitle: user.jobTitle || "",
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      cvUrl: user.cvUrl || "",
+      hiringDate: user.hiringDate || "",
     },
   });
 
-  const userId = currentUser.id;
+  const patchMutation = useMutation({
+    mutationFn: async (params: MutationParams) => {
+      if (params.formData) await update(params.id, params.formData!);
+      if (params.params) await patch(params.id, params.params);
+      if(params.remove) await  remove(params.id, params.remove.filename!);
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ['getUser']
+      });
+    },
+  });
+
+ 
+
+  const userId = user.id;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await patch(userId, values);
-    if (values.cv instanceof File) {
-      const formData = new FormData();
-      formData.append("files", values.cv);
-      await update(userId!, formData);
+    if (!Object.keys(form.formState.dirtyFields).length) return;
+
+    const dirtyValues = getDirtyFieldsValues(
+      form.formState.dirtyFields,
+      values
+    );
+
+    let formData: FormData | undefined = undefined;
+    if (dirtyValues.cvUrl) {
+      formData = new FormData();
+      formData.append("files", dirtyValues.cvUrl);
     }
 
-    await getUser();
-  }
+    delete dirtyValues.cvUrl;
 
-  const onSetHiringDate = (date:Date) => {
-    form.setValue('hiringDate', date.toISOString())
-    console.log('onSetHiringDate', date)
+    patchMutation.mutate({
+      id: userId,
+      params: Object.keys(dirtyValues).length ? dirtyValues : undefined,
+      formData,
+    });
   }
 
   const filename = useMemo(() => {
-    if (!currentUser.cvUrl) return "";
-    return currentUser.cvUrl.split("/").pop();
-  }, [currentUser.cvUrl]);
+    if (!user.cvUrl) return "";
+    return decodeURI(user.cvUrl.split("/").pop()!);
+  }, [user.cvUrl]);
 
   const deleteResume = useCallback(async () => {
     form.reset({
-      cv: "",
+      cvUrl: "",
     });
-    await remove(userId, filename!);
-    await getUser();
+    patchMutation.mutate({
+      id: userId,
+      remove: {
+        filename
+      }
+    });
   }, []);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-3/6 mr-auto ml-auto">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 w-3/6 mr-auto ml-auto"
+      >
         <FormField
           control={form.control}
           name="username"
@@ -173,22 +211,23 @@ const ProfileForm = () => {
         <FormField
           control={form.control}
           name="hiringDate"
-          render={({ field }) => (
+          render={({ field: { value, onChange } }) => (
             <FormItem>
               <FormLabel>Date of hire</FormLabel>
               <FormControl>
-                <DatePicker date={new Date(field.value!)} onSetDate={onSetHiringDate}/>
+                <DatePicker
+                  date={new Date(value!)}
+                  onSetDate={(d) => onChange(d.toISOString())}
+                />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription>When were have you beens hired?</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="cv"
+          name="cvUrl"
           render={({ field: { value, onChange, ...fieldProps } }) => (
             <FormItem>
               <FormLabel>Resume</FormLabel>
@@ -229,4 +268,4 @@ const ProfileForm = () => {
   );
 };
 
-export { ProfileForm };
+export default ProfileForm;
