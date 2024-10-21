@@ -1,31 +1,34 @@
 import { UserCard } from "@/components/UserCard";
+import { UsersTable } from "@/components/UsersTable";
 import { useAuth } from "@/context/Auth";
+import { UserProvider, useUserContext } from "@/context/UserContext";
 import httpUserClient from "@/http/user";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { IPagination, UserListResponseDto } from "@/models/dtos";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const HelloWorld = () => {
   const { user: currentUser } = useAuth();
-
+  const {offset} = useUserContext()
   const { list } = httpUserClient();
 
-  const { data: users, refetch: refetchUsers } = useQuery({
-    queryKey: ["listUsers"],
-    queryFn: async () => await list(),
+  
+  const { data, refetch: refetchUsers } = useQuery<UserListResponseDto>({
+    queryKey: ["listUsers", offset],
+    queryFn: async () => await list({limit: 5, offset}),
     refetchOnWindowFocus: false,
-    staleTime: (60 * 5) * 1000
+    staleTime: (60 * 5) * 1000,
   });
 
+  const {users, pagination} = data!
+
   return (
-    <>
-      <h1>Hello {currentUser?.username}!</h1>
-      <div className="grid grid-cols-4 gap-4">
-        {users?.map((u) => {
-          return (
-            <UserCard key={u?.id} deleteUserCallback={refetchUsers} user={u} />
-          );
-        })}
-      </div>
-    </>
+      <>
+        <h1>Hello {currentUser?.username}!</h1>
+        <div>
+          {users && <UsersTable users={users} pagination={pagination}/>}
+        </div>
+      </>
+    
   );
 };
 

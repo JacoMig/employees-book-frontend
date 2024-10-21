@@ -19,6 +19,7 @@ export interface IAuthContext {
   getUser: () => void;
   user: IUser | undefined;
   isLoading: boolean;
+  isError: boolean
 }
 
 export type DecodedToken = {
@@ -60,13 +61,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { get, login: userLogin } = httpUserClient();
 
   const queryClient = useQueryClient()
-  const { data: user, isLoading, refetch:getUser } = useQuery({
+  const { data: user, isLoading, refetch:getUser, isError } = useQuery({
     queryKey: ["getUser"],
     retry: false,
     queryFn: async ():Promise<IUser> => {
       const { decoded } = getDecodedToken();
       return await get(decoded?.payload.id!)
     },
+   // throwOnError: true,
   });
   
 
@@ -81,9 +83,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   
-
-  console.log("auth");
-
   if (isLoading)
     return (
       <div>
@@ -99,6 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         getUser,
         isLoading,
+        isError
       }}
     >
       {children}

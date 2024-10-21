@@ -1,4 +1,4 @@
-import { IUser, PatchUser } from "@/models/dtos";
+import { IUser, PatchUser, UserListQueryParams, UserListResponseDto } from "@/models/dtos";
 
 import ApiClient from "./apiClient";
 
@@ -13,7 +13,7 @@ interface IHttpUserClient {
     password: string
   ) => Promise<{ token: string }>;
   get: (id: string) => Promise<IUser>;
-  list: () => Promise<IUser[]>;
+  list: (queryParams?: UserListQueryParams) => Promise<UserListResponseDto>;
   remove: (id: string) => Promise<object>;
   patch: (id: string, params:PatchUser) => Promise<object>;
 }
@@ -72,8 +72,9 @@ const httpUserClient = (): IHttpUserClient => {
     });
   };
 
-  const list = async (): Promise<IUser[]> => {
-    return await ApiClient<IUser[]>(`${API_URL}user`, {
+  const list = async (queryParams?:UserListQueryParams): Promise<UserListResponseDto> => {
+    const params = queryParams ? `?limit=${queryParams.limit}&offset=${queryParams.offset}` : ""
+    return await ApiClient<UserListResponseDto>(`${API_URL}user${params}`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

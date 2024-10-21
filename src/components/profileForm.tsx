@@ -21,6 +21,8 @@ import { DatePicker } from "./DatePicker";
 import { IUser, PatchUser } from "@/models/dtos";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDirtyFieldsValues } from "@/lib/utils";
+import {ImageCropContainer} from "./ImageCropContainer";
+import { Spinner } from "./ui/spinner";
 
 export const formSchema = z.object({
   username: z
@@ -46,6 +48,7 @@ export const formSchema = z.object({
     ])
     .optional(),
   hiringDate: z.optional(z.string()),
+  profileImage: z.optional(z.string()),
 });
 
 type MutationParams = {
@@ -53,16 +56,15 @@ type MutationParams = {
   params?: PatchUser;
   formData?: FormData;
   remove?: {
-    filename: string
-  }
+    filename: string;
+  };
 };
 
 const ProfileForm = ({ user }: { user: IUser }) => {
   const { patch } = httpUserClient();
   const { update, remove } = httpUploadsClient();
-  const queryClient = useQueryClient()
- 
-  
+  const queryClient = useQueryClient();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,6 +75,7 @@ const ProfileForm = ({ user }: { user: IUser }) => {
       lastName: user.lastName || "",
       cvUrl: user.cvUrl || "",
       hiringDate: user.hiringDate || "",
+      profileImage: user.profileImage || "",
     },
   });
 
@@ -80,20 +83,19 @@ const ProfileForm = ({ user }: { user: IUser }) => {
     mutationFn: async (params: MutationParams) => {
       if (params.formData) await update(params.id, params.formData!);
       if (params.params) await patch(params.id, params.params);
-      if(params.remove) await  remove(params.id, params.remove.filename!);
+      if (params.remove) await remove(params.id, params.remove.filename!);
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({
-        queryKey: ['getUser']
+        queryKey: ["getUser"],
       });
     },
   });
 
- 
-
   const userId = user.id;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    
     if (!Object.keys(form.formState.dirtyFields).length) return;
 
     const dirtyValues = getDirtyFieldsValues(
@@ -128,17 +130,32 @@ const ProfileForm = ({ user }: { user: IUser }) => {
     patchMutation.mutate({
       id: userId,
       remove: {
-        filename
-      }
+        filename,
+      },
     });
   }, []);
-
+  
+  if(patchMutation.isPending) return <Spinner></Spinner>
+  
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 w-3/6 mr-auto ml-auto"
       >
+        <FormField
+          control={form.control}
+          name="profileImage"
+          render={({ field: { onChange, value } }) => (
+            <FormItem>
+              <FormLabel>Profile image</FormLabel>
+              <FormControl>
+                <ImageCropContainer imageUrl={value} onImageChange={onChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="username"
@@ -217,10 +234,10 @@ const ProfileForm = ({ user }: { user: IUser }) => {
               <FormControl>
                 <DatePicker
                   date={new Date(value!)}
-                  onSetDate={(d) => onChange(d.toISOString())}
+                  onSetDate={(d) => onChange(d.toString())}
                 />
               </FormControl>
-              <FormDescription>When were have you beens hired?</FormDescription>
+              <FormDescription>When have you been hired?</FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -32,7 +32,7 @@ const Navigation = () => {
         )}
       </div>
       <hr />
-     <AuthGuardedRoute> 
+     <AuthGuardedRoute>
         <Outlet />
       </AuthGuardedRoute> 
     </>

@@ -9,7 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useEffect, useState } from "react"
+
 
 export function DatePicker({onSetDate, date}: {onSetDate: (date:Date) => void, date: Date}) {
 

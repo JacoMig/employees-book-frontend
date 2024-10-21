@@ -12,11 +12,11 @@ const AuthGuardedRoute = ({
   nextRoute?: string
 }) => {
   const location = useLocation();
-  const {isLoading, user} = useAuth()
+  const {isLoading, user,isError} = useAuth()
   
   if (isLoading) return;
 
-  if (!user && !location.pathname.includes('login')) 
+  if ((!user && !location.pathname.includes('login'))) 
     return <Navigate to={"/login"} />;
   
 
