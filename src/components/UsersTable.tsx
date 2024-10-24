@@ -44,8 +44,8 @@ const UsersTable = ({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {users.map((user) => (
-                        <TableRow key={user.id}>
+                    {users.map((user, i) => (
+                        <TableRow key={`${user.id}-${i}`}>
                             <TableCell className="font-medium flex items-center flex-col">
                                 <Avatar>
                                     <AvatarImage src={user.profileImage} />
@@ -66,7 +66,7 @@ const UsersTable = ({
                             </TableCell>
                             <TableCell className="text-right">
                                 {user.cvUrl && (
-                                    <Link to={user?.cvUrl} target="_blank">
+                                    <Link to={user.cvUrl} target="_blank">
                                         {decodeURI(
                                             user.cvUrl.split('/').pop()!
                                         )}

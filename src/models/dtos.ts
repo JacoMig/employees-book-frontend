@@ -29,6 +29,7 @@ export type UserListResponseDto = {
 }
 
 export type UserListQueryParams = {
+    username?: string
     offset: number,
-    limit: number
+    limit: number,
 }

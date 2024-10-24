@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 const Pagination = ({ pagination }: { pagination: IPagination }) => {
     const {setOffset} = useUserContext()
-    const queryClient = useQueryClient();
+  
 
     const changePage = (dir:"prev" | "next") => {
         if(dir === "prev") 
@@ -13,9 +13,6 @@ const Pagination = ({ pagination }: { pagination: IPagination }) => {
         else
             setOffset((v) => v + 1)
         
-        queryClient.invalidateQueries({
-            queryKey: ["listUsers"],
-        });
     }
 
     const isNextDisabled = pagination.pages === pagination.currentPage

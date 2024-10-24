@@ -3,7 +3,8 @@ import { createContext, useContext, useState } from "react";
 export interface IUserContext {
    offset: number,
    setOffset:  React.Dispatch<React.SetStateAction<number>>
-
+   username?: string,
+   setUsername: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
 const UserContext = createContext<IUserContext>({} as IUserContext);
@@ -12,12 +13,15 @@ const UserContext = createContext<IUserContext>({} as IUserContext);
 export const UserProvider = ({children}:{children: React.ReactNode}) => {
     
     const [offset, setOffset] = useState(0)
+    const [username, setUsername] = useState<string | undefined>()
 
     return (
         <UserContext.Provider
           value={{
             offset,
-            setOffset
+            username,
+            setOffset,
+            setUsername
           }}
         >
           {children}

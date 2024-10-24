@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { decoded } = getDecodedToken();
       return await get(decoded?.payload.id!)
     },
-   // throwOnError: true,
+    refetchOnWindowFocus: false,
   });
   
 
