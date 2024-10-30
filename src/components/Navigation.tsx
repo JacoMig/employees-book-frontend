@@ -13,9 +13,6 @@ const Navigation = () => {
             <Link to="/" className="[&.active]:font-bold">
               Home
             </Link>
-            <Link to="/hello" className="[&.active]:font-bold">
-              Hello
-            </Link>
             <Link to="/profile" className="[&.active]:font-bold">
               Profile
             </Link>
@@ -26,13 +23,15 @@ const Navigation = () => {
             Logout
           </Link>
         ) : (
-          <Link to="/login" className="[&.active]:font-bold">
-            Login
+          <Link to="/sign-up" className="[&.active]:font-bold">
+            Sign up
           </Link>
         )}
       </div>
       <hr />
-     <AuthGuardedRoute>
+      <AuthGuardedRoute excludeRoutes={[
+        '/sign-up'
+      ]}>
         <Outlet />
       </AuthGuardedRoute> 
     </>

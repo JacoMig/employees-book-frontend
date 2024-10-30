@@ -24,7 +24,7 @@ export function SignUpForm() {
   const formSubmit = async (e: FormEvent) => {
     e.preventDefault();
     await register(username, email, password)
-    navigate('/hello')
+    navigate('/')
   };
 
   return (

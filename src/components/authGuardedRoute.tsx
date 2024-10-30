@@ -1,30 +1,32 @@
-import { useAuth } from "@/context/Auth";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-
-import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from '@/context/Auth'
+import { Navigate, useLocation } from 'react-router-dom'
 
 const AuthGuardedRoute = ({
-  children,
-  nextRoute,
+    children,
+    excludeRoutes,
+    nextRoute,
 }: {
-  children: React.ReactNode | (() => JSX.Element);
-  nextRoute?: string
+    children: React.ReactNode | (() => JSX.Element)
+    excludeRoutes: string[]
+    nextRoute?: string
 }) => {
-  const location = useLocation();
-  const {isLoading, user,isError} = useAuth()
-  
-  if (isLoading) return;
+    const location = useLocation()
+    const { isLoading, user, isError } = useAuth()
 
-  if ((!user && !location.pathname.includes('login'))) 
-    return <Navigate to={"/login"} />;
-  
+    const currentPath = location.pathname
 
-  if(nextRoute) 
-    return <Navigate to={nextRoute} />;
-  
+    if (isLoading) return
 
-  return <>{children}</>;
-};
+    if (
+        !user &&
+        !currentPath.includes('login') &&
+        !excludeRoutes.includes(currentPath)
+    )
+        return <Navigate to={'/login'} />
 
-export default AuthGuardedRoute;
+    if (nextRoute) return <Navigate to={nextRoute} />
+
+    return <>{children}</>
+}
+
+export default AuthGuardedRoute

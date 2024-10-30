@@ -10,7 +10,7 @@ interface CropperProps {
   uploadedImage: string;
   crop: Crop | undefined;
   setCrop: React.Dispatch<React.SetStateAction<Crop | undefined>>;
-  onCropComplete: (croppedImage: string) => void;
+  onCropComplete: (croppedImage: string, croppedFile: Blob) => void;
 }
 const Cropper: React.FC<CropperProps> = ({
   uploadedImage,
@@ -27,18 +27,18 @@ const Cropper: React.FC<CropperProps> = ({
     return {
       x: 0,
       y: 0,
-      width: imageRef.current.offsetHeight,
-      height: imageRef.current.offsetHeight,
+      width: 200,
+      height: 200,
       unit: "px",
     };
   };
 
  
   useEffect(() => {
-    if(imageRef.current?.offsetHeight && !crop) {
+    if(!crop) 
       setMyCrop(initialCrop())
-    }
-  }, [imageRef.current?.offsetHeight, crop, uploadedImage])
+    
+  }, [crop])
 
 
   const generateCroppedImage = async (crop: Crop | null) => {
@@ -70,8 +70,13 @@ const Cropper: React.FC<CropperProps> = ({
         crop.height
       );
     }
-    const croppedImageUrl = canvas.toDataURL("image/jpg");
-    onCropComplete(croppedImageUrl); // Call parent function with cropped data
+    
+    canvas.toBlob((file) => {
+      if(!file) return 
+      const croppedImageUrl = canvas.toDataURL("image/jpg");
+      onCropComplete(croppedImageUrl, file); 
+    }, "image/jpg")
+   
   };
 
   return (

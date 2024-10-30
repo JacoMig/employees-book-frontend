@@ -13,7 +13,9 @@ export interface IUser {
     hiringDate?: string
 }
 
-export type PatchUser = Omit<IUser, "id" | "userGroup">
+export type PatchUser = Omit<IUser, "id" | "userGroup" | "profileImage"> & {
+    profileImage?: Blob
+}
 
 
 export interface IPagination {

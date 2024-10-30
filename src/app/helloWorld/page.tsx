@@ -18,7 +18,7 @@ export const HelloWorld = () => {
     queryKey: ["listUsers", offset, username],
     queryFn: async () => await list({limit: 5, offset, username}),
     refetchOnWindowFocus: false,
-    staleTime: (60 * 5) * 1000,
+    staleTime: (60 * 2) * 1000,
   });
 
   

@@ -15,8 +15,11 @@ export function getDirtyFieldsValues(dirtyFields:object, allValues:z.infer<typeo
   let allValuesObject = allValues as Record<string, any>
   
   for(let field in dirtyFields) {
-    
+    if(field === 'profileImage') 
+      formValues[field as keyof PatchUser] = allValuesObject[field]['file']
+    else
     formValues[field as keyof PatchUser] = allValuesObject[field]
+    
   }
   return formValues as PatchUser
 }

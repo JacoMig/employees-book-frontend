@@ -1,8 +1,14 @@
 import ApiClient from "./apiClient";
 
+export type RemoveParams= {
+  id: string, 
+  filename: string,
+  removeKey: 'cvUrl' | 'profileImage'
+}
+
 interface IHttpUploadsClient {
   update: (id: string, file: FormData) => Promise<object>;
-  remove: (id: string, filename: string) => Promise<object>;
+  remove: (params: RemoveParams) => Promise<object>;
 }
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -21,16 +27,17 @@ const httpUploadsClient = (): IHttpUploadsClient => {
     );
   };
 
-  const remove = async (id: string, filename: string) => {
+  const remove = async (params:RemoveParams) => {
     return await ApiClient<object>(
-      `${API_URL}rpc/uploads/${id}/remove-cv`,
+      `${API_URL}rpc/uploads/${params.id}/remove-cv`,
       {
         headers: { 
             Accept: "application/json",
             "Content-Type": "application/json"},
         method: "POST",
         body: JSON.stringify({
-            filename
+            filename: params.filename,
+            removeKey: params.removeKey
         }),
       },
       false
