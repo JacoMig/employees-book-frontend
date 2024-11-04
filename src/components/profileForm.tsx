@@ -23,6 +23,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { getDirtyFieldsValues } from '@/lib/utils'
 import { ImageCropContainer } from './ImageCropContainer'
 import { Spinner } from './ui/spinner'
+import { useToast } from '@/hooks/use-toast'
 
 export const formSchema = z.object({
     username: z
@@ -49,10 +50,7 @@ export const formSchema = z.object({
         .optional(),
     hiringDate: z.optional(z.string()),
     profileImage: z.optional(
-        z.object({
-            image: z.string(),
-            file: z.any(),
-        })
+        z.string()
     ),
 })
 
@@ -70,6 +68,7 @@ const ProfileForm = ({ user }: { user: IUser }) => {
     const { patch } = httpUserClient()
     const { update, remove } = httpUploadsClient()
     const queryClient = useQueryClient()
+    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -81,13 +80,10 @@ const ProfileForm = ({ user }: { user: IUser }) => {
             lastName: user.lastName || '',
             cvUrl: user.cvUrl || '',
             hiringDate: user.hiringDate || '',
-            profileImage: {
-                image: user.profileImage || '',
-                file: {},
-            },
+            profileImage: user.profileImage || '',
         },
     })
-
+    console.log(user);
     const patchMutation = useMutation({
         mutationFn: async (params: MutationParams) => {
             if (params.formData) await update(params.id, params.formData!)
@@ -100,8 +96,19 @@ const ProfileForm = ({ user }: { user: IUser }) => {
                 })
         },
         onSuccess: async () => {
-            queryClient.invalidateQueries({
+            await queryClient.invalidateQueries({
                 queryKey: ['getUser'],
+            })
+
+            toast({
+                title: 'User updated successfully!',
+            })
+        },
+        onError: (e) => {
+            toast({
+                title: 'Error while updating user',
+                description: e.message,
+                variant: 'destructive',
             })
         },
     })
@@ -123,7 +130,8 @@ const ProfileForm = ({ user }: { user: IUser }) => {
         }
 
         if (dirtyValues.profileImage) {
-            formData = new FormData()
+            if(!formData) 
+                formData = new FormData()
             formData.append('profileImage', dirtyValues.profileImage)
         }
 
@@ -142,18 +150,44 @@ const ProfileForm = ({ user }: { user: IUser }) => {
         return decodeURI(user.cvUrl.split('/').pop()!)
     }, [user.cvUrl])
 
+    const uploadFile = useCallback(
+        async (file: Blob | string) => {
+            const formData: FormData | undefined = new FormData()
+            formData.append('files', file)
+            
+            patchMutation.mutate(
+                {
+                    id: userId,
+                    formData
+                },
+                {
+                   
+                }
+            )
+        },
+        [patchMutation, userId]
+    )
+
     const deleteFile = useCallback(
         async (name: string, removeKey: 'cvUrl' | 'profileImage') => {
-            patchMutation.mutate({
-                id: userId,
-                remove: {
-                    filename: name,
-                    removeKey,
+            patchMutation.mutate(
+                {
+                    id: userId,
+                    remove: {
+                        filename: name,
+                        removeKey,
+                    },
                 },
-            })
-            form.resetField("profileImage")
+                {
+                    onSuccess: () => {
+                        form.resetField('profileImage', {
+                            defaultValue: '',
+                        })
+                    },
+                }
+            )
         },
-        []
+        [patchMutation, form, userId]
     )
 
     if (patchMutation.isPending) return <Spinner></Spinner>
@@ -172,8 +206,11 @@ const ProfileForm = ({ user }: { user: IUser }) => {
                             <FormControl>
                                 <ImageCropContainer
                                     deleteFile={deleteFile}
-                                    imageUrl={value?.image}
-                                    onImageChange={onChange}
+                                    imageUrl={value}
+                                    onImageChange={(p) => {
+                                        onChange(p.image)
+                                        uploadFile(p.file)
+                                    }}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -288,7 +325,7 @@ const ProfileForm = ({ user }: { user: IUser }) => {
                             <FormLabel>Resume</FormLabel>
                             {user?.cvUrl ? (
                                 <div className="space-y-2">
-                                    <Link to={user?.cvUrl} target="_blank">
+                                    <Link to={value as string} target="_blank">
                                         {cvFileName}
                                     </Link>
                                     <Button

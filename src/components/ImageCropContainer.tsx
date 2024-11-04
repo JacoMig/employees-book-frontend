@@ -13,13 +13,18 @@ import {
 import { TrashIcon } from 'lucide-react'
 import DummyImage from '../assets/no-profile-picture-icon.png'
 
+type ImageChangeParams = {
+    image: string,
+    file: Blob
+}
+
 const ImageCropContainer = ({
     imageUrl,
     onImageChange,
     deleteFile,
 }: {
     imageUrl: string | undefined
-    onImageChange: any
+    onImageChange: (params:ImageChangeParams) => void
     deleteFile: (name: string, removeKey: 'cvUrl' | 'profileImage') => void
 }) => {
     const [uploadedImage, setUploadedImage] = useState<string | undefined>() // For the image source
@@ -63,7 +68,7 @@ const ImageCropContainer = ({
         setOpenModal((prev) => !prev)
         setUploadedImage(undefined)
     }
-
+    
     const hasImage = croppedImage || imageUrl
     const srcImage = hasImage ? hasImage : DummyImage
     

@@ -6,38 +6,34 @@ const ApiClient = async <T>(
   options: RequestInit,
   isAuthorized: boolean = true
 ): Promise<T> => {
-  const { token } = getDecodedToken();
+  //const { token } = getDecodedToken();
  
   const response = await fetch(url, {
     ...options,
     headers: isAuthorized
-      ? { ...options.headers, Authorization: "Bearer " + token }
+      ? { ...options.headers, Authorization: "Bearer " + getDecodedToken()?.token }
       : options.headers,
   });
   
+  const data = await response.json()
   if(!response.ok) {
-    const message = response.statusText
+    
     switch(response.status) {
       case 400:
-        throw new BadRequestError(message)     
+        throw new BadRequestError(data.message)     
       case 401:
-        throw new UnauthorizedError(message)
+        throw new UnauthorizedError(data.message)
       case 403:
-        throw new ForbiddenError(message)
+        throw new ForbiddenError(data.message)
       case 404:
-        throw new NotFoundError(message)    
+        throw new NotFoundError(data.message)    
       default : throw new UknownError()          
     }
     
   }
 
-  const data =  response.json();
-  
   return data as T;
  
-  
-   
-  
 };
 
 export default ApiClient;

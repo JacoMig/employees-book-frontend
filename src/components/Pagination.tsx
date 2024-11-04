@@ -1,7 +1,7 @@
 import { IPagination } from '@/models/dtos'
 import { Button } from './ui/button'
 import { useUserContext } from '@/context/UserContext'
-import { useQueryClient } from '@tanstack/react-query'
+
 
 const Pagination = ({ pagination }: { pagination: IPagination }) => {
     const {setOffset} = useUserContext()
@@ -19,7 +19,7 @@ const Pagination = ({ pagination }: { pagination: IPagination }) => {
     const isPrevDisabled = pagination.offset === 0
 
     return (
-        <div className="flex justify-end items-center my-6">
+        <div className="flex justify-end items-center mt-auto">
             <Button disabled={isPrevDisabled} type="button" onClick={() => changePage("prev")}>Prev</Button>
             <p>
                 {pagination.currentPage} / {pagination.pages}

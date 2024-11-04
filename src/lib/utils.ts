@@ -8,17 +8,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+type AllValues = z.infer<typeof formSchema>
 
-
-export function getDirtyFieldsValues(dirtyFields:object, allValues:z.infer<typeof formSchema>) {
-  let formValues:Record<string, any> = {}
-  let allValuesObject = allValues as Record<string, any>
+export function getDirtyFieldsValues(dirtyFields:object, allValues:AllValues) {
+  const formValues:Record<string, unknown> = {}
   
-  for(let field in dirtyFields) {
-    if(field === 'profileImage') 
-      formValues[field as keyof PatchUser] = allValuesObject[field]['file']
-    else
-    formValues[field as keyof PatchUser] = allValuesObject[field]
+  for(const field in dirtyFields) {
+    formValues[field as keyof PatchUser] = allValues[field as keyof AllValues]
     
   }
   return formValues as PatchUser

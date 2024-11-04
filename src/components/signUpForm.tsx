@@ -8,23 +8,53 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import httpUserClient from "@/http/user";
+import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+
+type SignUpParams = {
+  username: string,
+  email: string,
+  password: string
+}
 
 export function SignUpForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const {register} = httpUserClient()
-  // const {login, getUser} = useAuth()
+  
   const navigate = useNavigate()
+  const {toast} = useToast()
+
+  const signUpMutation = useMutation({
+    mutationFn: async (params: SignUpParams) => {
+      await register(params.username, params.email, params.password)
+    },
+    onError: (e) => {
+      toast({
+        title: "Error while signing up",
+        description: e.message,
+        variant: "destructive"
+      })
+    },
+    onSuccess: async () => {
+      toast({
+        title: "Signed up successfully",
+      })
+      navigate('/login')
+    },
+  })
 
   const formSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await register(username, email, password)
-    navigate('/')
+    signUpMutation.mutate({
+      username, email, password
+    })
+   
   };
 
   return (

@@ -42,12 +42,12 @@ const Cropper: React.FC<CropperProps> = ({
 
 
   const generateCroppedImage = async (crop: Crop | null) => {
-    if (!crop || !crop.width || !crop.height) return;
+    if (!crop || !crop.width || !crop.height || !imageRef.current) return;
 
     const image = new Image();
     image.src = uploadedImage;
-    image.width = imageRef.current?.width!;
-    image.height = imageRef.current?.height!;
+    image.width = imageRef.current.width;
+    image.height = imageRef.current.height;
 
     const canvas = document.createElement("canvas");
     const scaleX = image.naturalWidth / image.width;

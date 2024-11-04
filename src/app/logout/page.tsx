@@ -10,7 +10,7 @@ const Logout = () => {
     useEffect(() => {
        logout()
        navigate('/login')
-    },[])
+    },[logout, navigate])
 
     return (
         <div>Logged Out!</div>

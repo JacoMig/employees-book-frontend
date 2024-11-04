@@ -67,7 +67,7 @@ const httpUserClient = (): IHttpUserClient => {
         )
     }
 
-    const get = async (id: string): Promise<IUser> => {
+    const get = async (id: string | undefined): Promise<IUser> => {
         return await ApiClient<IUser>(`${API_URL}user/${id}`, {
             headers: {
                 Accept: 'application/json',

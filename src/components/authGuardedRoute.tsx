@@ -11,7 +11,7 @@ const AuthGuardedRoute = ({
     nextRoute?: string
 }) => {
     const location = useLocation()
-    const { isLoading, user, isError } = useAuth()
+    const { isLoading, user } = useAuth()
 
     const currentPath = location.pathname
 

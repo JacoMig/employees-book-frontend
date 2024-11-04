@@ -1,9 +1,7 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -20,6 +18,7 @@ const UsersTable = ({
     users: IUser[]
     pagination: IPagination
 }) => {
+
     const userInitials = (user: IUser) => {
         if (!user.firstName || !user.lastName)
             return user.username.substring(0, 2)

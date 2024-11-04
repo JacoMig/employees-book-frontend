@@ -1,5 +1,5 @@
 import { SearchBar } from "@/components/SearchBar";
-import { Input } from "@/components/ui/input";
+
 import { Spinner } from "@/components/ui/spinner";
 import { UsersTable } from "@/components/UsersTable";
 import { useAuth } from "@/context/Auth";
@@ -14,7 +14,7 @@ export const HelloWorld = () => {
   const { list } = httpUserClient();
 
   
-  const { data, isSuccess, isLoading } = useQuery<UserListResponseDto>({
+  const { data, isLoading } = useQuery<UserListResponseDto>({
     queryKey: ["listUsers", offset, username],
     queryFn: async () => await list({limit: 5, offset, username}),
     refetchOnWindowFocus: false,
@@ -25,7 +25,7 @@ export const HelloWorld = () => {
     return (
         <>
           <h1>Hello {currentUser?.username}!</h1>
-          <div>
+          <div className="flex flex-col h-full">
             <SearchBar />
             {isLoading ? <Spinner></Spinner> : 
               (data &&  <UsersTable users={data.users} pagination={data.pagination}/>)
