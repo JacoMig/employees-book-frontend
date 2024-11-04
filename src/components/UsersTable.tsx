@@ -10,6 +10,12 @@ import { IPagination, IUser } from '@/models/dtos'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Link } from 'react-router-dom'
 import { Pagination } from './Pagination'
+import { useMemo } from 'react'
+import { useAuth } from '@/context/Auth'
+import { Button } from './ui/button'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useToast } from '@/hooks/use-toast'
+import httpUserClient from '@/http/user'
 
 const UsersTable = ({
     users,
@@ -18,6 +24,25 @@ const UsersTable = ({
     users: IUser[]
     pagination: IPagination
 }) => {
+    const { user: currentUser } = useAuth()
+    const { remove } = httpUserClient()
+
+    const { toast } = useToast()
+    const queryClient = useQueryClient()
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id: string) => await remove(id),
+        mutationKey: ['deleteUser'],
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['listUsers'],
+            })
+
+            toast({
+                title: 'User deleted successfully!',
+            })
+        },
+    })
 
     const userInitials = (user: IUser) => {
         if (!user.firstName || !user.lastName)
@@ -27,6 +52,10 @@ const UsersTable = ({
             1
         )}`
     }
+
+    const isSuperAdmin = useMemo(() => {
+        return currentUser?.userGroup.includes('superadmin')
+    }, [])
 
     return (
         <>
@@ -40,6 +69,7 @@ const UsersTable = ({
                             Hiring date
                         </TableHead>
                         <TableHead className="text-center">Resume</TableHead>
+                        <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -63,7 +93,7 @@ const UsersTable = ({
                                     ? new Date(user.hiringDate).toDateString()
                                     : ''}
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell>
                                 {user.cvUrl && (
                                     <Link to={user.cvUrl} target="_blank">
                                         {decodeURI(
@@ -71,6 +101,20 @@ const UsersTable = ({
                                         )}
                                     </Link>
                                 )}
+                            </TableCell>
+
+                            <TableCell>
+                                {isSuperAdmin &&
+                                    user.id !== currentUser?.id && (
+                                        <Button
+                                            onClick={() =>
+                                                deleteMutation.mutate(user.id)
+                                            }
+                                            variant="destructive"
+                                        >
+                                            Delete
+                                        </Button>
+                                    )}
                             </TableCell>
                         </TableRow>
                     ))}

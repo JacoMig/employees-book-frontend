@@ -24,6 +24,14 @@ import { getDirtyFieldsValues } from '@/lib/utils'
 import { ImageCropContainer } from './ImageCropContainer'
 import { Spinner } from './ui/spinner'
 import { useToast } from '@/hooks/use-toast'
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from './ui/select'
 
 export const formSchema = z.object({
     username: z
@@ -49,9 +57,8 @@ export const formSchema = z.object({
         ])
         .optional(),
     hiringDate: z.optional(z.string()),
-    profileImage: z.optional(
-        z.string()
-    ),
+    profileImage: z.optional(z.string()),
+    userGroup: z.string(),
 })
 
 type MutationParams = {
@@ -81,9 +88,10 @@ const ProfileForm = ({ user }: { user: IUser }) => {
             cvUrl: user.cvUrl || '',
             hiringDate: user.hiringDate || '',
             profileImage: user.profileImage || '',
+            userGroup: user.userGroup || 'customer',
         },
     })
-    console.log(user);
+
     const patchMutation = useMutation({
         mutationFn: async (params: MutationParams) => {
             if (params.formData) await update(params.id, params.formData!)
@@ -117,12 +125,12 @@ const ProfileForm = ({ user }: { user: IUser }) => {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!Object.keys(form.formState.dirtyFields).length) return
-
+        
         const dirtyValues = getDirtyFieldsValues(
             form.formState.dirtyFields,
             values
         )
-
+        
         let formData: FormData | undefined = undefined
         if (dirtyValues.cvUrl) {
             formData = new FormData()
@@ -130,8 +138,7 @@ const ProfileForm = ({ user }: { user: IUser }) => {
         }
 
         if (dirtyValues.profileImage) {
-            if(!formData) 
-                formData = new FormData()
+            if (!formData) formData = new FormData()
             formData.append('profileImage', dirtyValues.profileImage)
         }
 
@@ -154,15 +161,13 @@ const ProfileForm = ({ user }: { user: IUser }) => {
         async (file: Blob | string) => {
             const formData: FormData | undefined = new FormData()
             formData.append('files', file)
-            
+
             patchMutation.mutate(
                 {
                     id: userId,
-                    formData
+                    formData,
                 },
-                {
-                   
-                }
+                {}
             )
         },
         [patchMutation, userId]
@@ -312,6 +317,39 @@ const ProfileForm = ({ user }: { user: IUser }) => {
                             </FormControl>
                             <FormDescription>
                                 When have you been hired?
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="userGroup"
+                    render={({ field: {value, onChange} }) => (
+                        <FormItem>
+                            <FormLabel>Role</FormLabel>
+                            <FormControl>
+                                <Select value={value} onValueChange={(val) => onChange(val)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Change Role" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="superadmin">
+                                                Superadmin
+                                            </SelectItem>
+                                            <SelectItem value="editor">
+                                                Editor
+                                            </SelectItem>
+                                            <SelectItem value="customer">
+                                                Customer
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormDescription>
+                                Change the user role
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
