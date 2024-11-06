@@ -3,6 +3,8 @@ export interface IUser {
     username: string,
     email: string,
     userGroup: string,
+    companyId: string,
+    companyName: string,
     firstName?:string,
     lastName?:string,
     jobTitle?: string,
@@ -10,7 +12,8 @@ export interface IUser {
     tags?: string[],
     cvUrl?: string,
     profileImage?: string,
-    hiringDate?: string
+    hiringDate?: string,
+    
 }
 
 export type PatchUser = Omit<IUser, "id" | "userGroup" | "profileImage"> & {
@@ -31,7 +34,14 @@ export type UserListResponseDto = {
 }
 
 export type UserListQueryParams = {
+    companyId: string,
     username?: string
     offset: number,
     limit: number,
+}
+
+export type CreateRandomUsersParams = {
+    num:number,
+    companyId: string,
+    companyName: string
 }

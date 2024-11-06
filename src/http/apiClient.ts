@@ -26,8 +26,8 @@ const ApiClient = async <T>(
       case 403:
         throw new ForbiddenError(data.message)
       case 404:
-        throw new NotFoundError(data.message)    
-      default : throw new UknownError()          
+        throw new NotFoundError(data.message)
+      default : throw new UknownError(data.message)          
     }
     
   }

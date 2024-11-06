@@ -137,18 +137,13 @@ const ProfileForm = ({ user }: { user: IUser }) => {
             formData.append('files', dirtyValues.cvUrl)
         }
 
-        if (dirtyValues.profileImage) {
-            if (!formData) formData = new FormData()
-            formData.append('profileImage', dirtyValues.profileImage)
-        }
-
         delete dirtyValues.cvUrl
         delete dirtyValues.profileImage
 
         patchMutation.mutate({
             id: userId,
             params: Object.keys(dirtyValues).length ? dirtyValues : undefined,
-            formData,
+            formData
         })
     }
 

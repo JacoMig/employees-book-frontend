@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/Auth'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import AuthGuardedRoute from './authGuardedRoute'
 import { Toaster } from './ui/toaster'
 
@@ -12,12 +12,12 @@ const Navigation = () => {
             <div className="p-2 flex gap-2">
                 {user ? (
                     <>
-                        <Link to="/" className="[&.active]:font-bold">
+                        <NavLink  to="/" className="[&.active]:font-bold">
                             Employees
-                        </Link>
-                        <Link to="/profile" className="[&.active]:font-bold">
+                        </NavLink>
+                        <NavLink to="/profile" className="[&.active]:font-bold">
                             Profile
-                        </Link>
+                        </NavLink>
                     </>
                 ) : null}
 

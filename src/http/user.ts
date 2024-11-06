@@ -1,4 +1,5 @@
 import {
+    CreateRandomUsersParams,
     IUser,
     PatchUser,
     UserListQueryParams,
@@ -21,6 +22,7 @@ interface IHttpUserClient {
     list: (queryParams?: UserListQueryParams) => Promise<UserListResponseDto>
     remove: (id: string) => Promise<object>
     patch: (id: string, params: PatchUser) => Promise<object>
+    createRandomUsers: (params:CreateRandomUsersParams) => Promise<{ added: number }>
 }
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -81,9 +83,13 @@ const httpUserClient = (): IHttpUserClient => {
         queryParams?: UserListQueryParams
     ): Promise<UserListResponseDto> => {
         const params = queryParams
-            ? `?limit=${queryParams.limit}&offset=${
-                  queryParams.offset
-              }${queryParams.username ? `&username=${queryParams.username}` : ''}`
+            ? `?companyId=${queryParams.companyId}&limit=${
+                  queryParams.limit
+              }&offset=${queryParams.offset}${
+                  queryParams.username
+                      ? `&username=${queryParams.username}`
+                      : ''
+              }`
             : ''
         return await ApiClient<UserListResponseDto>(`${API_URL}user${params}`, {
             headers: {
@@ -111,7 +117,27 @@ const httpUserClient = (): IHttpUserClient => {
         })
     }
 
-    return { register, get, login, list, remove, patch }
+    const createRandomUsers = async (
+        params: CreateRandomUsersParams
+    ): Promise<{ added: number }> => {
+        return await ApiClient<{ added: number }>(
+            `${API_URL}rpc/users/createRandomUsers`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    count: params.num,
+                    companyId: params.companyId,
+                    companyName: params.companyName,
+                }),
+            }
+        )
+    }
+
+    return { register, get, login, list, remove, patch, createRandomUsers }
 }
 
 export default httpUserClient
