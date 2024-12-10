@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Employees Book Frontend** is a web application built to interact with the Employees Book Backend API. It allows users to manage employee records by providing an intuitive interface to **create**, **view**, **update**, and **delete** employee information. Users can search, filter, and sort employees by various criteria. The app is designed to be fast, responsive, and user-friendly, providing a seamless experience for managing employee data.
+The **Employees Book Frontend** is a web application built to interact with the [Employees Book Backend API](https://github.com/JacoMig/employees-book-backend). It allows users to manage employee records by providing an intuitive interface to **create**, **view**, **update**, and **delete** employee information. Users can search, filter, and sort employees by various criteria. The app is designed to be fast, responsive, and user-friendly, providing a seamless experience for managing employee data.
 
 ## Features
 
