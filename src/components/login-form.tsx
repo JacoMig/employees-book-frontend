@@ -34,8 +34,7 @@ export function LoginForm() {
         onError: (e) => {
           console.log(e);
           toast({
-            title: "Error while loading",
-            description: e.message,
+            title: e.message,
             variant: "destructive"
           })
         },
