@@ -13,7 +13,7 @@ interface IHttpUserClient {
         username: string,
         email: string,
         password: string
-    ) => Promise<{ username: string; email: string }>
+    ) => Promise<{ username: string; email: string, token: string }>
     login: (
         usernameOrEmail: string,
         password: string
@@ -51,7 +51,7 @@ const httpUserClient = (): IHttpUserClient => {
         email: string,
         password: string
     ) => {
-        return await ApiClient<{ username: string; email: string }>(
+        return await ApiClient<{ username: string; email: string, token: string }>(
             `${API_URL}register`,
             {
                 headers: {

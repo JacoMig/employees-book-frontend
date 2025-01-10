@@ -58,7 +58,7 @@ export function removeStoredToken() {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { get, login: userLogin } = httpUserClient();
   const [token, setToken] = useState(getDecodedToken())
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   
   const { data: user, isLoading, refetch:getUser, isError } = useQuery({
     queryKey: ["getUser", token],
@@ -83,7 +83,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = useCallback(() => {
     setToken(undefined)
     removeStoredToken();
-  }, [queryClient]);
+    
+  }, []);
 
   
   if (isLoading)

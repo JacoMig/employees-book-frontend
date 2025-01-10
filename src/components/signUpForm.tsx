@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getDecodedToken, setStoredToken, useAuth } from "@/context/Auth";
 import { useToast } from "@/hooks/use-toast";
 import httpUserClient from "@/http/user";
 import { useMutation } from "@tanstack/react-query";
@@ -26,13 +27,14 @@ export function SignUpForm() {
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const {register} = httpUserClient()
-  
+  const { setToken } = useAuth()
+
   const navigate = useNavigate()
   const {toast} = useToast()
 
   const signUpMutation = useMutation({
     mutationFn: async (params: SignUpParams) => {
-      await register(params.username, params.email, params.password)
+      return await register(params.username, params.email, params.password)
     },
     onError: (e) => {
       toast({
@@ -41,11 +43,15 @@ export function SignUpForm() {
         variant: "destructive"
       })
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      setStoredToken(data.token)
+      const t = getDecodedToken()
+      setToken(t)
+      
       toast({
         title: "Signed up successfully",
       })
-      navigate('/login')
+      navigate('/')
     },
   })
 

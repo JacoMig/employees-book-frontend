@@ -161,8 +161,7 @@ const ProfileForm = ({ user }: { user: IUser }) => {
                 {
                     id: userId,
                     formData,
-                },
-                {}
+                }
             )
         },
         [patchMutation, userId]
