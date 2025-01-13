@@ -6,11 +6,7 @@ const ProfilePage = () => {
   const { user } = useAuth();
   if (!user) return;
  
-  return (
-    <>
-      <ProfileForm user={user} />
-    </>
-  );
+  return ( <ProfileForm user={user} />);
 };
 
 export { ProfilePage };
