@@ -8,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 
 import httpUserClient from "@/http/user";
 import { Spinner } from "@/components/ui/spinner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export interface IAuthContext {
   logout: () => void;
