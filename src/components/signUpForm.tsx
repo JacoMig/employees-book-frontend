@@ -26,6 +26,7 @@ import {
     FormLabel,
     FormMessage,
 } from './ui/form'
+import { Spinner } from './ui/spinner'
 
 const formSchemaSignUp = z.object({
     username: z
@@ -182,7 +183,7 @@ export function SignUpForm() {
                                 />
                             </div>
                             <Button type="submit" className="w-full">
-                                Sign Up
+                                {signUpMutation.isPending ? <Spinner></Spinner> : 'Sign Up'}
                             </Button>
                             {/* <Button variant="outline" className="w-full">
             Login with Google
