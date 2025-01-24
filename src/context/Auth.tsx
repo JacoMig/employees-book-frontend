@@ -78,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = useCallback(async (email: string, password: string) => {
     const response = await userLogin(email!, password!);
     setStoredToken(response.token);
+    setToken(getDecodedToken())
   }, [userLogin]);
 
   const logout = useCallback(() => {

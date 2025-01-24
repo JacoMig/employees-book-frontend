@@ -22,13 +22,15 @@ export function getDirtyFieldsValues(dirtyFields:object, allValues:AllValues) {
 
 
 
-export const debounce = function(delay:number, cb: () => void) {
+export const debounce = function(delay:number, cb: (value:string) => void) {
   let timer:NodeJS.Timeout;
     
-  return function () {
+  return function (value:string){
   
     clearTimeout(timer);
-  
-    timer = setTimeout(() => {cb()}, delay);
+    
+    timer = setTimeout(() => {
+      cb(value);
+    }, delay);
   };
 };

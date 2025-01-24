@@ -8,10 +8,10 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getDecodedToken, useAuth } from '@/context/Auth'
+import { useAuth } from '@/context/Auth'
 import { useToast } from '@/hooks/use-toast'
 import { useMutation } from '@tanstack/react-query'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 type LoginParams = {
@@ -22,9 +22,8 @@ type LoginParams = {
 export function LoginForm() {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
-    const { login, setToken } = useAuth()
+    const { login, user } = useAuth()
     const navigate = useNavigate()
-    // const queryClient = useQueryClient()
     const {toast} = useToast()
 
     const loginMutation = useMutation({
@@ -39,10 +38,6 @@ export function LoginForm() {
           })
         },
         onSuccess: async () => {
-         
-            const t = getDecodedToken()
-            setToken(t)
-
             toast({
               title: "Logged in successfully",
             })
@@ -57,6 +52,12 @@ export function LoginForm() {
           password
         })
     }
+
+    useEffect(() => {
+        if(user) {
+            navigate('/')
+        }
+    }, [user])
 
     return (
         <Card className="mx-auto max-w-sm">

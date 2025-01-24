@@ -15,7 +15,7 @@ export const HelloWorld = () => {
     const currentUser = user!
     const { offset, username } = useUserContext()
     const { list } = httpUserClient()
-    const { setOffset } = useUserContext()
+  
     const isCreatingRandomUsers = useIsMutating({
         mutationKey: ['createRandomUsers'],
     })
@@ -33,11 +33,7 @@ export const HelloWorld = () => {
         //staleTime: 60 * 2 * 1000,
     })
 
-    useEffect(() => {
-        if (isSuccess) {
-            if (!data.users.length) setOffset((v) => v - 1)
-        }
-    }, [isSuccess, data])
+   
 
     return (
         <>

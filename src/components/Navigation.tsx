@@ -40,10 +40,12 @@ const Navigation = () => {
             </div>
             <hr />
             <AuthGuardedRoute excludeRoutes={['/sign-up']}>
-                <div className="py-12 h-5/6">
-                    <Outlet />
+                <div>
+                    <div className="py-12 h-5/6">
+                        <Outlet />
+                    </div>
+                    <Toaster />
                 </div>
-                <Toaster />
             </AuthGuardedRoute>
         </>
     )

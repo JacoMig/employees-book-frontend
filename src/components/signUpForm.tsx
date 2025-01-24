@@ -40,16 +40,13 @@ const formSchemaSignUp = z.object({
     email: z.string().email(),
     password: z
         .string()
-        .min(8, {
-            message: 'Password must be at least 8 chars long',
-        })
-        .max(16, {
-            message: 'Password must be at most 16 chars long',
+        .min(1, {
+            message: 'Password must be at least 1 char long',
         })
         .regex(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~_&*%!?@#$])[A-Za-z\d~_&*%!?@#$]+$/,
+            /^[A-Za-z\d~_&*%!?@#$]+$/,
             {
-                message: `Password  must contain letters, numbers, and ~_&*%!?@#$`,
+                message: `Password must contain letters, numbers and a special char ~_&*%!?@#$`,
             }
         ),
 })
@@ -182,12 +179,15 @@ export function SignUpForm() {
                                     )}
                                 />
                             </div>
-                            <Button type="submit" className="w-full">
-                                {signUpMutation.isPending ? <Spinner></Spinner> : 'Sign Up'}
-                            </Button>
-                            {/* <Button variant="outline" className="w-full">
-            Login with Google
-          </Button> */}
+                            {signUpMutation.isPending ? (
+                                <div>
+                                    <Spinner></Spinner>
+                                </div>
+                            ) : (
+                                <Button type="submit" className="w-full">
+                                    Sign Up
+                                </Button>
+                            )}
                         </div>
                         <div className="mt-4 text-center text-sm">
                             Do you have an account?{' '}

@@ -14,8 +14,8 @@ const Pagination = ({ pagination }: { pagination: IPagination }) => {
         if (dir === 'prev') setOffset((v) => v - 1)
         else setOffset((v) => v + 1)
     }
-
-    const isNextDisabled = pagination.pages === pagination.currentPage
+    const totalPages = pagination.pages || 1
+    const isNextDisabled = totalPages === pagination.currentPage
     const isPrevDisabled = pagination.offset === 0
 
     return (
@@ -29,7 +29,7 @@ const Pagination = ({ pagination }: { pagination: IPagination }) => {
                 <DoubleArrowLeftIcon />
             </Button>
             <p>
-                page {pagination.currentPage} of {pagination.pages}
+                page {pagination.currentPage} of {totalPages}
             </p>
             <Button
                 disabled={isNextDisabled}

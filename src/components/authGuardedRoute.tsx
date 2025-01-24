@@ -1,21 +1,20 @@
 import { useAuth } from '@/context/Auth'
+import { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 
 const AuthGuardedRoute = ({
     children,
     excludeRoutes,
-    nextRoute,
 }: {
-    children: React.ReactNode | (() => JSX.Element)
+    children: ReactNode
     excludeRoutes: string[]
-    nextRoute?: string
-}) => {
+}): ReactNode => {
     const location = useLocation()
     const { isLoading, user } = useAuth()
 
     const currentPath = location.pathname
 
-    if (isLoading) return
+    if (isLoading) return <div>Loading...</div>
 
     if (
         !user &&
@@ -24,9 +23,9 @@ const AuthGuardedRoute = ({
     )
         return <Navigate to={'/login'} />
 
-    if (nextRoute) return <Navigate to={nextRoute} />
+    
 
-    return <>{children}</>
+    return (children)
 }
 
 export default AuthGuardedRoute
