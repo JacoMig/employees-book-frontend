@@ -8,7 +8,7 @@ import { useUserContext } from '@/context/UserContext'
 import httpUserClient from '@/http/user'
 import { UserListResponseDto } from '@/models/dtos'
 import { useIsMutating, useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
+
 
 export const HelloWorld = () => {
     const { user } = useAuth()
@@ -20,7 +20,7 @@ export const HelloWorld = () => {
         mutationKey: ['createRandomUsers'],
     })
 
-    const { data, isLoading, isSuccess } = useQuery<UserListResponseDto>({
+    const { data, isLoading } = useQuery<UserListResponseDto>({
         queryKey: ['listUsers', offset, username],
         queryFn: async () =>
             await list({
