@@ -15,8 +15,8 @@ const Navigation = () => {
                         <NavLink  to="/" className="[&.active]:font-bold">
                             Employees
                         </NavLink>
-                        <NavLink to="/profile" className="[&.active]:font-bold">
-                            Profile
+                        <NavLink to={`profile/${user.id}`} className="[&.active]:font-bold">
+                            My profile
                         </NavLink>
                     </>
                 ) : null}
