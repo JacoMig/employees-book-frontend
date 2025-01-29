@@ -30,7 +30,6 @@ export const HelloWorld = () => {
                 username,
             }),
         refetchOnWindowFocus: false,
-        //staleTime: 60 * 2 * 1000,
     })
 
    

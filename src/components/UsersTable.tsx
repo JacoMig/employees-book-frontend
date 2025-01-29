@@ -76,13 +76,15 @@ const UsersTable = ({
                     {users.map((user, i) => (
                         <TableRow key={`${user.id}-${i}`}>
                             <TableCell className="font-medium flex items-center flex-col">
-                                <Avatar>
-                                    <AvatarImage src={user.profileImage} />
-                                    <AvatarFallback>
-                                        {userInitials(user)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>{user.username}</div>
+                                <Link className='userTableLink' to={"/profile/"+user.id}>
+                                    <Avatar>
+                                        <AvatarImage src={user.profileImage} />
+                                        <AvatarFallback>
+                                            {userInitials(user)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>{user.username}</div>
+                                </Link>
                             </TableCell>
                             <TableCell>
                                 {user.firstName} {user.lastName}
